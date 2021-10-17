@@ -1,0 +1,33 @@
+
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// N-BIT DEMUX
+//
+////////////////////////////////////////////////////////////////////////////////
+module demux (
+    bits_out, sel, bit_in
+);
+    parameter SEL_BITS = 1;
+    output bits_out[2**SEL_BITS - 1: 0];
+    input sel[SEL_BITS-1:0];
+    input bit_in;
+    
+    assign bits_out = 2**SEL_BITS'h00 | (bit_in << sel);
+endmodule
+
+////////////////////////////////////////////////////////////////////////////////
+// 
+// N-BIT MUX
+//
+////////////////////////////////////////////////////////////////////////////////
+module mux (
+    out, sel, bits_in
+);
+    parameter SEL_BITS = 1;
+    output out;
+    input sel[SEL_BITS-1:0];
+    input bits_in[2**SEL_BITS - 1: 0];
+
+    assign out = bits_in[sel];
+endmodule
