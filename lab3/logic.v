@@ -8,26 +8,37 @@ module logic_operations (
     out, a, b, opcode
 );
 parameter N = 16;
-output out[N-1:0];
-input a[N-1:0];
-input b[N-1:0];
-input opcode[2:0];
+output [N-1:0] out;
+reg [N-1:0] out_reg;
+input [N-1:0] a;
+input [N-1:0] b;
+input [2:0] opcode;
 
-begin
+assign out = out_reg;
+
+always @(a or b or opcode) begin
     case (opcode)
-        3'b000: 
+        3'b000: begin
             // AND
-            out = a & b;
-        3'b001: 
+            out_reg = a & b;
+        end
+        3'b001: begin
             // OR
-            out = a | b;
-        3'b010: 
+            out_reg = a | b;
+        end
+        3'b010: begin
             // XOR
-            out = a ^ b;
+            out_reg = a ^ b;
+        end
         3'b100: 
+        begin
             // NOT A
-            out = ~a;
+            out_reg = ~a;
+        end
         default: 
+        begin
+            out_reg = 0;
+        end
     endcase
 end
 

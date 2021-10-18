@@ -9,11 +9,11 @@ module demux (
     bits_out, sel, bit_in
 );
     parameter SEL_BITS = 1;
-    output bits_out[2**SEL_BITS - 1: 0];
-    input sel[SEL_BITS-1:0];
+    output [2**SEL_BITS - 1: 0] bits_out;
+    input [SEL_BITS-1:0] sel;
     input bit_in;
     
-    assign bits_out = 2**SEL_BITS'h00 | (bit_in << sel);
+    assign bits_out = (bit_in << sel);
 endmodule
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,8 +26,8 @@ module mux (
 );
     parameter SEL_BITS = 1;
     output out;
-    input sel[SEL_BITS-1:0];
-    input bits_in[2**SEL_BITS - 1: 0];
+    input [SEL_BITS-1:0] sel;
+    input [2**SEL_BITS - 1: 0] bits_in;
 
     assign out = bits_in[sel];
 endmodule
