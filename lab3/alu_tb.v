@@ -1,8 +1,8 @@
 module alu_tb;
 
     // INPUTS TO ALU
-    reg [15:0] a;
-    reg [15:0] b;
+    reg signed [15:0] a;
+    reg signed [15:0] b;
     reg cin;
     reg [4:0] alu_code;
     wire [2:0] opcode = alu_code[2:0];
@@ -19,6 +19,14 @@ module alu_tb;
     // LOGIC DUT
     wire [15:0] logic_out;
     logic_operations #(16) DUT_LOGIC(logic_out, a, b, opcode);
+
+    // SHIFT DUT
+    wire [15:0] shift_out;
+    shifter #(16) SHIFTER_DUT(shift_out, a, b, opcode);
+
+    // CONDITIONAL DUT
+    wire [15:0] cond_out;
+    conditional #(16) CONDITIONAL_DUT(cond_out, a, b, opcode);
 
     initial begin
         $display($time, " === TESTING ARITHMETIC BLOCK ===");
@@ -94,6 +102,79 @@ module alu_tb;
         #5 a = 16'b1111111100000000; b = 16'b1111000011110000;
         #5;
         $display($time, " ~%b = %b", a, logic_out);
+
+
+        $display($time, " ");
+        $display($time, " ");
+        $display($time, " === TESTING SHIFTER BLOCK ===");
+
+        alu_code = 5'b10000;
+        $display($time, " ");
+        $display($time, " LOGIC LEFT SHIFT (ALU_code=%b)", alu_code);
+        #5 a = 16'b0000000001010101; b = 16'b0000000000001000;
+        #5;
+        $display($time, " %b << %d = %b", a, b, shift_out);
+
+
+        alu_code = 5'b10001;
+        $display($time, " ");
+        $display($time, " LOGIC RIGHT SHIFT (ALU_code=%b)", alu_code);
+        #5 a = 16'b1010101000000000; b = 16'b0000000000001000;
+        #5;
+        $display($time, " %b >>> %d = %b", a, b, shift_out);
+
+        alu_code = 5'b10010;
+        $display($time, " ");
+        $display($time, " ARITHMETIC LEFT SHIFT (ALU_code=%b)", alu_code);
+        #5 a = 16'b0000000001010101; b = 16'b0000000000001000;
+        #5;
+        $display($time, " %b << %d = %b", a, b, shift_out);
+
+        alu_code = 5'b10011;
+        $display($time, " ");
+        $display($time, " ARITHMETIC RIGHT SHIFT (ALU_code=%b)", alu_code);
+        #5 a = 16'b1010101000000000; b = 16'b0000000000001000;
+        #5;
+        $display($time, " %b >> %d = %b", a, b, shift_out);
+
+
+
+
+        $display($time, " ");
+        $display($time, " ");
+        $display($time, " === TESTING CONIDTIONAL BLOCK ===");
+        alu_code = 5'b11000;
+        $display($time, " ");
+        $display($time, " ALU_CODE |  A  |  B  |  RESULT");
+        #5 a = 16'h01; b = 16'h02; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = 16'h01; b = 16'h00; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        alu_code = 5'b11001;
+        #5 a = 16'h02; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        alu_code = 5'b11010;
+        #5 a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        alu_code = 5'b11011;
+        #5 a = 16'h02; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        alu_code = 5'b11100;
+        #5 a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        alu_code = 5'b11101;
+        #5 a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        #5 a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
 
         $display($time, " << DONE >>");
 
