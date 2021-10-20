@@ -29,7 +29,7 @@ module alu_tb;
         cin = 1'b0;
         #10;
 
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         b = 16'h01; alu_code = 5'b00000;
@@ -37,28 +37,28 @@ module alu_tb;
 
         $display($time, " ");
         $display($time, " SIGNED ADDITION (ALU_code=%b)", alu_code);
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
         a = 16'h05; b = 16'h05;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
         
         a = 16'b1111111111111111; b = 16'b1111111111111111; cin = 1;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         cin = 0; b = 16'h01; a = 16'h01; alu_code = 5'b00001;
         #10;
         $display($time, " ");
         $display($time, " UNSIGNED ADDITION (ALU_code=%b)", alu_code);
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         a = 16'h55; b = 16'hA5A5; 
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         $display($time, " ");
@@ -68,13 +68,13 @@ module alu_tb;
         a = 16'h08; b = 16'h04; 
         #10;
         
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         a = 16'h0A; b = 16'h04;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
-                          a,      b,     coe,     result,   cout,     vout);
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
 
         $display($time, " ");
         #10 alu_code = 5'b00011;
@@ -83,13 +83,13 @@ module alu_tb;
         a = 16'hFFFF; b = 16'hA5A5; 
         #10;
         
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         a = 16'h0A; b = 16'h04;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
-                          a,      b,     coe,     result,   cout,     vout);
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
 
         $display($time, " ");
         #10 alu_code = 5'b00100;
@@ -98,13 +98,13 @@ module alu_tb;
         a = 16'h0001; b = 16'h0000; 
         #10;
         
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         a = 16'h000F; b = 16'h0000;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
-                          a,      b,     coe,     result,   cout,     vout);
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
         
         $display($time, " ");
         #10 alu_code = 5'b00101;
@@ -113,13 +113,13 @@ module alu_tb;
         a = 16'h0002; b = 16'h0000; 
         #10;
         
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
         a = 16'h0010; b = 16'h0000;
         #10;
-        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
-                          a,      b,     coe,     result,   cout,     vout);
+        $display($time, " A=%h | B=%h | COE=%b | OUT=%h | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
 
 
         $display($time, " ");

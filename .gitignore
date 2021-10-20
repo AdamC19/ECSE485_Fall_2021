@@ -7,4 +7,9 @@ Proc.*
 da_report_file
 netlist.v
 output/
+report/
 *.mgc_component.attr
+*.synctex.gz
+*.fdb_latexmk
+*.aux
+*.fls
