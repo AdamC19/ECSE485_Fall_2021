@@ -14,9 +14,9 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
     input [2:0] opcode;
     input cin, coe;
 
-    reg [N-1:0] adder_a = 0;
-    reg [N-1:0] adder_b = 0;
-    reg adder_cin = 1'b0;
+    reg [N-1:0] adder_a;
+    reg [N-1:0] adder_b;
+    reg adder_cin;
     reg cout_reg;
     reg vout_reg;
     wire [N-1:0] adder_out;
@@ -24,10 +24,10 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
 
     adder #(N) ADD(adder_out, adder_cout, adder_a, adder_b, adder_cin);
     assign result = adder_out;
-    assign cout = cout_reg;
     assign vout = vout_reg;
+    assign cout = !coe ? adder_cout : 0;
 
-    always @(a or b or cin) begin
+    always @(a or b or cin or opcode) begin
         case (opcode)
             3'b000: 
             begin
@@ -35,12 +35,16 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_a = a;
                 adder_b = b;
                 adder_cin = cin;
-                if(coe == 1'b0) cout_reg = adder_cout;
-                else cout_reg = 1'bz;
+                // todo, set overflow (vout)
+                vout_reg = 0;
             end
             3'b001:
             begin
                 // unsigned addition
+                adder_a = a;
+                adder_b = b;
+                adder_cin = cin;
+                vout_reg  = adder_cout == 1;
             end
             3'b010:
             begin
@@ -51,31 +55,45 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 // take the bitwise negation of b and add 1
                 adder_b = ~b;
                 adder_cin = 1'b1;
-                // result = adder_out;
+                // check for carry into, but not out of, the most significant bit
+                vout_reg = 0;
             end  
             3'b011:
             begin
                 // unsigned subtraction
+                // a + (-b) -> c
+                adder_a = a;
+
+                // take the bitwise negation of b and add 1
+                adder_b = ~b;
+                adder_cin = 1'b1;
+                // result = adder_out;
+                vout_reg = adder_cout == 1;
             end
             3'b100:
             begin
                 // increment
                 // a + 1 -> c
+                adder_cin = 1'b0;
                 adder_a = a;
-                adder_b = 16'h01;
+                adder_b = 16'h0001;
                 // result = adder_out;
+                vout_reg = adder_cout == 1;
             end
             3'b101:
             begin
                 // decrement
-                // a + 1 -> c
+                // a + (-1) -> c
+                adder_cin = 1'b0;
                 adder_a = a;
-                adder_b = 16'b1111111111111101;
+                adder_b = 16'b1111111111111111;
                 // result = adder_out;
+                vout_reg = adder_cout == 1;
             end
             default: 
             begin
-                
+                cout_reg = 0;
+                vout_reg = 0;
             end
         endcase
     end

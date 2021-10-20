@@ -1,34 +1,25 @@
-module alu_tb;
+`timescale 1ns/100ps
 
+module alu_tb;
+    
     // INPUTS TO ALU
     reg signed [15:0] a;
     reg signed [15:0] b;
     reg cin;
     reg [4:0] alu_code;
-    wire [2:0] opcode = alu_code[2:0];
     reg coe;
 
     // OUTPUTS FROM ALU
-    wire [15:0] result;
     wire cout;
     wire vout;
+    wire [15:0] result;
 
-    //adder #(16) DUT_ADDER(result, cout, a, b, cin);
-    arithmetic #(16) DUT_ARITHMETIC(result, cout, vout, opcode, a, b, cin, coe);
-
-    // LOGIC DUT
-    wire [15:0] logic_out;
-    logic_operations #(16) DUT_LOGIC(logic_out, a, b, opcode);
-
-    // SHIFT DUT
-    wire [15:0] shift_out;
-    shifter #(16) SHIFTER_DUT(shift_out, a, b, opcode);
-
-    // CONDITIONAL DUT
-    wire [15:0] cond_out;
-    conditional #(16) CONDITIONAL_DUT(cond_out, a, b, opcode);
+    alu ALU_DUT(result, cout, vout, a, b, cin, coe, alu_code);
 
     initial begin
+        $dumpfile("alu.vcd");
+        $dumpvars(0, alu_tb);
+
         $display($time, " === TESTING ARITHMETIC BLOCK ===");
 
         a = 16'h00;
@@ -41,30 +32,92 @@ module alu_tb;
         $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
-        #5 b = 16'h01;
-        #5;
+        b = 16'h01; alu_code = 5'b00000;
+        #10;
 
         $display($time, " ");
         $display($time, " SIGNED ADDITION (ALU_code=%b)", alu_code);
         $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
-        #5 a = 16'h05; b = 16'h05;
-        #5;
+        a = 16'h05; b = 16'h05;
+        #10;
         $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
         
+        a = 16'b1111111111111111; b = 16'b1111111111111111; cin = 1;
+        #10;
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        cin = 0; b = 16'h01; a = 16'h01; alu_code = 5'b00001;
+        #10;
         $display($time, " ");
-        alu_code = 5'b00010;
+        $display($time, " UNSIGNED ADDITION (ALU_code=%b)", alu_code);
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        a = 16'h55; b = 16'hA5A5; 
+        #10;
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        $display($time, " ");
+        #10 alu_code = 5'b00010;
         $display($time, " SIGNED SUBTRACTION (ALU_code=%b)", alu_code);
 
-        #5 a = 16'h08; b = 16'h04; 
-        #5;
+        a = 16'h08; b = 16'h04; 
+        #10;
         
         $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
                           a,      b,     coe,    result,   cout,     vout);
 
-        #5 a = 16'h0A; b = 16'h04;
-        #5;
+        a = 16'h0A; b = 16'h04;
+        #10;
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,     result,   cout,     vout);
+
+        $display($time, " ");
+        #10 alu_code = 5'b00011;
+        $display($time, " UNSIGNED SUBTRACTION (ALU_code=%b)", alu_code);
+
+        a = 16'hFFFF; b = 16'hA5A5; 
+        #10;
+        
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        a = 16'h0A; b = 16'h04;
+        #10;
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,     result,   cout,     vout);
+
+        $display($time, " ");
+        #10 alu_code = 5'b00100;
+        $display($time, " INCREMENT (ALU_code=%b)", alu_code);
+
+        a = 16'h0001; b = 16'h0000; 
+        #10;
+        
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        a = 16'h000F; b = 16'h0000;
+        #10;
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,     result,   cout,     vout);
+        
+        $display($time, " ");
+        #10 alu_code = 5'b00101;
+        $display($time, " DECREMENT (ALU_code=%b)", alu_code);
+
+        a = 16'h0002; b = 16'h0000; 
+        #10;
+        
+        $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
+                          a,      b,     coe,    result,   cout,     vout);
+
+        a = 16'h0010; b = 16'h0000;
+        #10;
         $display($time, " A=%b | B=%b | COE=%b | OUT=%b | COUT=%b | VOUT=%b", 
                           a,      b,     coe,     result,   cout,     vout);
 
@@ -73,35 +126,39 @@ module alu_tb;
         $display($time, " ");
         $display($time, " === TESTING LOGIC BLOCK ===");
 
-        $display($time, " ");
         alu_code = 5'b01000;
-        $display($time, " AND (ALU_code=%b)", alu_code);
-        #5 a = 16'b1111111100000000; b = 16'b1111000011110000;
-        #5;
-        $display($time, " %b & %b = %b", a, b, logic_out);
-
+        #10;
         $display($time, " ");
+        $display($time, " AND (ALU_code=%b)", alu_code);
+        a = 16'b1111111100000000; b = 16'b1111000011110000;
+        #10;
+        $display($time, " %b & %b = %b", a, b, result);
+
         alu_code = 5'b01001;
+        #10;
+        $display($time, " ");
         $display($time, " OR (ALU_code=%b)", alu_code);
         #5 a = 16'b1111111100000000; b = 16'b1111000011110000;
         #5;
-        $display($time, " %b | %b = %b", a, b, logic_out);
+        $display($time, " %b | %b = %b", a, b, result);
 
 
-        $display($time, " ");
         alu_code = 5'b01010;
-        $display($time, " XOR (ALU_code=%b)", alu_code);
-        #5 a = 16'b1111111100000000; b = 16'b1111000011110000;
-        #5;
-        $display($time, " %b XOR %b = %b", a, b, logic_out);
-
-
+        #10;
         $display($time, " ");
+        $display($time, " XOR (ALU_code=%b)", alu_code);
+        a = 16'b1111111100000000; b = 16'b1111000011110000;
+        #10;
+        $display($time, " %b XOR %b = %b", a, b, result);
+
+
         alu_code = 5'b01100;
+        #10;
+        $display($time, " ");
         $display($time, " NOT (ALU_code=%b)", alu_code);
-        #5 a = 16'b1111111100000000; b = 16'b1111000011110000;
-        #5;
-        $display($time, " ~%b = %b", a, logic_out);
+        a = 16'b1111111100000000; b = 16'b1111000011110000;
+        #10;
+        $display($time, " ~%b = %b", a, result);
 
 
         $display($time, " ");
@@ -109,33 +166,37 @@ module alu_tb;
         $display($time, " === TESTING SHIFTER BLOCK ===");
 
         alu_code = 5'b10000;
+        #10;
         $display($time, " ");
         $display($time, " LOGIC LEFT SHIFT (ALU_code=%b)", alu_code);
-        #5 a = 16'b0000000001010101; b = 16'b0000000000001000;
-        #5;
-        $display($time, " %b << %d = %b", a, b, shift_out);
+        a = 16'b0000000001010101; b = 16'b0000000000001000;
+        #10;
+        $display($time, " %b << %d = %b", a, b, result);
 
 
         alu_code = 5'b10001;
+        #10;
         $display($time, " ");
         $display($time, " LOGIC RIGHT SHIFT (ALU_code=%b)", alu_code);
-        #5 a = 16'b1010101000000000; b = 16'b0000000000001000;
-        #5;
-        $display($time, " %b >>> %d = %b", a, b, shift_out);
+        a = 16'b1010101000000000; b = 16'b0000000000001000;
+        #10;
+        $display($time, " %b >>> %d = %b", a, b, result);
 
         alu_code = 5'b10010;
+        #10;
         $display($time, " ");
         $display($time, " ARITHMETIC LEFT SHIFT (ALU_code=%b)", alu_code);
-        #5 a = 16'b0000000001010101; b = 16'b0000000000001000;
-        #5;
-        $display($time, " %b << %d = %b", a, b, shift_out);
+        a = 16'b0000000001010101; b = 16'b0000000000001000;
+        #10;
+        $display($time, " %b << %d = %b", a, b, result);
 
         alu_code = 5'b10011;
+        #10;
         $display($time, " ");
         $display($time, " ARITHMETIC RIGHT SHIFT (ALU_code=%b)", alu_code);
-        #5 a = 16'b1010101000000000; b = 16'b0000000000001000;
-        #5;
-        $display($time, " %b >> %d = %b", a, b, shift_out);
+        a = 16'b1010101000000000; b = 16'b0000000000001000;
+        #10;
+        $display($time, " %b >> %d = %b", a, b, result);
 
 
 
@@ -146,35 +207,35 @@ module alu_tb;
         alu_code = 5'b11000;
         $display($time, " ");
         $display($time, " ALU_CODE |  A  |  B  |  RESULT");
-        #5 a = 16'h01; b = 16'h02; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = 16'h01; b = 16'h00; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h01; b = 16'h02; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = 16'h01; b = 16'h00; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
         alu_code = 5'b11001;
-        #5 a = 16'h02; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = -1; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h02; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
         alu_code = 5'b11010;
-        #5 a = 16'h01; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = -1; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
         alu_code = 5'b11011;
-        #5 a = 16'h02; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = -1; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h02; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
         alu_code = 5'b11100;
-        #5 a = 16'h01; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = -1; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
         alu_code = 5'b11101;
-        #5 a = 16'h01; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
-        #5 a = -1; b = 16'h01; #5;
-        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, cond_out);
+        a = 16'h01; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
+        a = -1; b = 16'h01; #5;
+        $display($time, " %8b | %3d | %3d | %3d", alu_code, a, b, result);
 
         $display($time, " << DONE >>");
 
