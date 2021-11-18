@@ -14,11 +14,6 @@ input [BITS-1:0] a;
 input [BITS-1:0] b;
 input cin;
 
-wire [BITS:0] tmp;
-
-assign tmp = a + b + cin;
-assign sum = tmp[BITS-1:0];
-assign cout = tmp[BITS];
-
+assign {cout, sum} = a + b + cin;
 
 endmodule

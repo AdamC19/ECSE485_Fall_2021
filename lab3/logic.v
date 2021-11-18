@@ -9,11 +9,11 @@ module logic_operations (
 );
 parameter N = 16;
 output [N-1:0] out;
-reg [N-1:0] out_reg;
 input [N-1:0] a;
 input [N-1:0] b;
 input [2:0] opcode;
 
+reg [N-1:0] out_reg;
 assign out = out_reg;
 
 always @(a or b or opcode) begin

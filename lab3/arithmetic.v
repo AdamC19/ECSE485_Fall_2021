@@ -9,21 +9,19 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
     output [N-1:0] result;
     output cout;
     output vout;
+    input [2:0] opcode;
     input [N-1:0] a;
     input [N-1:0] b;
-    input [2:0] opcode;
     input cin, coe;
 
     reg [N-1:0] adder_a;
     reg [N-1:0] adder_b;
     reg adder_cin;
-    reg cout_reg;
     reg vout_reg;
-    wire [N-1:0] adder_out;
     wire adder_cout;
 
-    adder #(N) ADD(adder_out, adder_cout, adder_a, adder_b, adder_cin);
-    assign result = adder_out;
+    adder #(N) ADD(result, adder_cout, adder_a, adder_b, adder_cin);
+    
     assign vout = vout_reg;
     assign cout = !coe ? adder_cout : 0;
 
@@ -35,8 +33,7 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_a = a;
                 adder_b = b;
                 adder_cin = cin;
-                // todo, set overflow (vout)
-                vout_reg = 0;
+                vout_reg = (result[N-1] != b[N-1]) && (a[N-1] != b[N-1]);
             end
             3'b001:
             begin
@@ -44,7 +41,7 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_a = a;
                 adder_b = b;
                 adder_cin = cin;
-                vout_reg  = adder_cout == 1;
+                vout_reg  = adder_cout;
             end
             3'b010:
             begin
@@ -56,7 +53,7 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_b = ~b;
                 adder_cin = 1'b1;
                 // check for carry into, but not out of, the most significant bit
-                vout_reg = 0;
+                vout_reg = (result[N-1] != b[N-1]) && (a[N-1] != b[N-1]);
             end  
             3'b011:
             begin
@@ -78,7 +75,7 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_a = a;
                 adder_b = 16'h0001;
                 // result = adder_out;
-                vout_reg = adder_cout == 1;
+                vout_reg = (result[N-1] != b[N-1]) && (a[N-1] != b[N-1]);
             end
             3'b101:
             begin
@@ -88,11 +85,13 @@ module arithmetic(result, cout, vout, opcode, a, b, cin, coe);
                 adder_a = a;
                 adder_b = 16'b1111111111111111;
                 // result = adder_out;
-                vout_reg = adder_cout == 1;
+                vout_reg = (result[N-1] != b[N-1]) && (a[N-1] != b[N-1]);
             end
             default: 
             begin
-                cout_reg = 0;
+                adder_cin = 0;
+                adder_a = 0;
+                adder_b = 0;
                 vout_reg = 0;
             end
         endcase
