@@ -98,6 +98,9 @@ module conditional(result, a, b, opcode);
                     result_reg = 0;
                 end
             end
+            default: begin
+                result_reg = 0;
+            end
         endcase
     end
 

@@ -6,7 +6,7 @@
 #the output is sent to stdout
 #
 
-cktdir=/home/adam/Documents/ecse485/lab3
+cktdir=$(readlink -f .)
 
 elsyn << //EOF
 
@@ -14,7 +14,7 @@ read  /mgc/Leonardo/lib/ami05_typ.syn
 #read /mgc/Leonardo/lib/tsmc035_typ.syn
 
 read {$cktdir/alu.v} {$cktdir/arithmetic.v} {$cktdir/logic.v} {$cktdir/shifter.v} {$cktdir/adder.v} \
-        {$cktdir/conditional.v}
+        {$cktdir/conditional.v} {$cktdir/output_mux.v}
 
 pre_optimize -common_logic -unused_logic -boundary -xor_comparator_optimize
 pre_optimize -extract

@@ -15,7 +15,6 @@ module shifter (
     input [2:0] opcode;
 
     reg [BITS-1:0] result_reg;
-    reg [BITS-1:0] mask;
 
     assign result = result_reg;
 
@@ -39,9 +38,13 @@ module shifter (
                 // arithmetic right shift of A by B
                 // pad MSB with sign bit
                 if (a[BITS-1] == 1) begin
-                    mask = 16'hFF << (BITS - b);
+                    result_reg = (a >> b) | (32'hFF00 >> b);
+                end else begin
+                    result_reg = (a >> b);
                 end
-                result_reg = (a >> b) | mask;
+            end
+            default: begin
+                result_reg = 0;
             end
         endcase
     end

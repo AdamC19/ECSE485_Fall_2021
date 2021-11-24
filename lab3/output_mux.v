@@ -20,7 +20,7 @@ assign c =  (op_select == 2'b00 ? arith_route :
             16'h00
             ) ) ) );
 
-assign cout = (!coe && (operation == 2'b00)) ? cout_gate : 0;
-assign vout = (!coe && (operation == 2'b00)) ? vout_gate : 0;
+assign cout = (!coe && (op_select == 2'b00)) ? cout_gate : 0;
+assign vout = (!coe && (op_select == 2'b00)) ? vout_gate : 0;
 
-endmodule;
+endmodule
