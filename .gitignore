@@ -13,3 +13,7 @@ report/
 *.fdb_latexmk
 *.aux
 *.fls
+_*
+_*.*
+_*/
+work/

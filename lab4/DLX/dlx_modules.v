@@ -27,14 +27,44 @@ module IFCtrl (
 	PCVector			// Exception Vectors 
 );
 
+input  [`WordSize]     IR2;
+input                  Equal;
+input                  MRST;
+output [1:0]           PCMuxSelect;
+output [`WordSize]     PCVector;
+
+assign PCMuxSelect = 	({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`J, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JAL, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BEQZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BNEZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`RFE,		`DC6, 	`DC1, 	`DC1} 	? 2'b10 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`TRAP, 	`DC6, 	`DC1,	`DC1} 	? 2'b10 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JR, 		`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JALR, 	`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`TRAP2, `DC1, 	`DC1} 	? 2'b10 :
+						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`DC6, 	`DC1, 	1'b0} 	? 2'b10 :
+						2'b00 ))))))))));
+
 endmodule
 
 module IDCtrl (
 	IR2,				// Instruction that is being decoded in stage II
 	PCAddMuxSelect			// Select Signals for the PCAddMux in Stage II
 );
+
+input  [`WordSize]      IR2;
+output [1:0]            PCAddMuxSelect;
+
+assign PCAddMuxSelect = 	(IR2[`OP] == `BEQZ 	? 2'b00 :
+							(IR2[`OP] == `BNEZ 	? 2'b00 :
+							(IR2[`OP] == `J 	? 2'b01 :
+							(IR2[`OP] == `JAL 	? 2'b01 :
+							(IR2[`OP] == `JR 	? 2'b10 :
+							(IR2[`OP] == `JALR	? 2'b10 :
+							2'b11 ))))));
+
 endmodule
-					
+
 //**********************************************************************
 //**********************************************************************
 module EXCtrl (
