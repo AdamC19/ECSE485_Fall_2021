@@ -33,17 +33,38 @@ input                  MRST;
 output [1:0]           PCMuxSelect;
 output [`WordSize]     PCVector;
 
-assign PCMuxSelect = 	({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`J, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JAL, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BEQZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BNEZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`RFE,		`DC6, 	`DC1, 	`DC1} 	? 2'b10 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`TRAP, 	`DC6, 	`DC1,	`DC1} 	? 2'b10 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JR, 		`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JALR, 	`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`TRAP2, `DC1, 	`DC1} 	? 2'b10 :
-						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`DC6, 	`DC1, 	1'b0} 	? 2'b10 :
-						2'b00 ))))))))));
+reg    [1:0]           PCMuxSelect;
+reg                    ifBranch;
+
+always @(IR2 or Equal or MRST)
+begin
+       casex({ IR2[`OP], IR2[`OPx], Equal, MRST})
+             {       `J, `DC6,  `DC1, 1'b1}: PCMuxSelect <= 2'b01;
+             {     `JAL, `DC6,  `DC1, 1'b1}: PCMuxSelect <= 2'b01;
+             {    `BEQZ, `DC6,  1'b1, 1'b1}: PCMuxSelect <= 2'b01;
+             {    `BNEZ, `DC6,  1'b0, 1'b1}: PCMuxSelect <= 2'b01;
+             {     `RFE, `DC6,  `DC1, `DC1}: PCMuxSelect <= 2'b10;
+             {    `TRAP, `DC6,  `DC1, `DC1}: PCMuxSelect <= 2'b10;
+             {      `JR, `DC6,  `DC1, 1'b1}: PCMuxSelect <= 2'b11;
+             {    `JALR, `DC6,  `DC1, 1'b1}: PCMuxSelect <= 2'b11;
+             {`DC6,    `TRAP2,  `DC1, `DC1}: PCMuxSelect <= 2'b10;
+             {`DC6, `DC6,  `DC1, 1'b0}: PCMuxSelect <= 2'b10;
+                                         default: PCMuxSelect <= 2'b00;                            
+       endcase                   
+end
+
+// assign PCMuxSelect = 	({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`J, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JAL, 		`DC6, 	`DC1, 	1'b1} 	? 2'b01 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BEQZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`BNEZ, 	`DC6, 	1'b1, 	1'b1} 	? 2'b01 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`RFE,		`DC6, 	`DC1, 	`DC1} 	? 2'b10 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`TRAP, 	`DC6, 	`DC1,	`DC1} 	? 2'b10 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JR, 		`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`JALR, 	`DC6, 	`DC1, 	1'b1} 	? 2'b11 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`TRAP2, `DC1, 	`DC1} 	? 2'b10 :
+// 						({ IR2[`OP], IR2[`OPx], Equal, MRST} == {`DC6, 		`DC6, 	`DC1, 	1'b0} 	? 2'b10 :
+// 						2'b00 ))))))))));
+
 
 endmodule
 
@@ -55,13 +76,27 @@ module IDCtrl (
 input  [`WordSize]      IR2;
 output [1:0]            PCAddMuxSelect;
 
-assign PCAddMuxSelect = 	(IR2[`OP] == `BEQZ 	? 2'b00 :
-							(IR2[`OP] == `BNEZ 	? 2'b00 :
-							(IR2[`OP] == `J 	? 2'b01 :
-							(IR2[`OP] == `JAL 	? 2'b01 :
-							(IR2[`OP] == `JR 	? 2'b10 :
-							(IR2[`OP] == `JALR	? 2'b10 :
-							2'b11 ))))));
+reg    [1:0]            PCAddMuxSelect;
+
+always @(IR2)
+begin
+       case(IR2[`OP])
+           `BEQZ     : PCAddMuxSelect <= 2'b00;
+           `BNEZ     : PCAddMuxSelect <= 2'b00;
+              `J     : PCAddMuxSelect <= 2'b01;
+            `JAL     : PCAddMuxSelect <= 2'b01;
+             `JR     : PCAddMuxSelect <= 2'b10;
+           `JALR     : PCAddMuxSelect <= 2'b10;
+       endcase
+end
+
+// assign PCAddMuxSelect = 	(IR2[`OP] == `BEQZ 	? 2'b00 :
+// 							(IR2[`OP] == `BNEZ 	? 2'b00 :
+// 							(IR2[`OP] == `J 	? 2'b01 :
+// 							(IR2[`OP] == `JAL 	? 2'b01 :
+// 							(IR2[`OP] == `JR 	? 2'b10 :
+// 							(IR2[`OP] == `JALR	? 2'b10 :
+// 							2'b11 ))))));
 
 endmodule
 
