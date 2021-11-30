@@ -8,8 +8,10 @@ fi
 FILES_TO_TRASH=("system.v" "clkgen.v")
 
 for FILE in ${FILES_TO_TRASH[@]}; do
-    echo "Moving $FILE to _trash..."
-    mv $FILE ./_trash
+    if [ -f "$FILE" ]; then
+        echo "Moving $FILE to _trash..."
+        mv $FILE _trash
+    fi
 done
 
 vlog ./*.v
